@@ -4,13 +4,7 @@ from google.cloud import bigquery
 from datetime import datetime
 import hashlib
 from google.oauth2 import service_account
-from posthog import Posthog
 
-# Initialize PostHog
-posthog = Posthog(
-    project_api_key='phc_iY1kjQZ5ib5oy0PU2fRIqJZ5323jewSS5fVDNyhe7RY',
-    host='https://us.i.posthog.com'
-)
 
 # Authentication credentials (same as tgr.py)
 CREDENTIALS = {
@@ -191,14 +185,7 @@ def main():
 
     # Track page view
     if "current_user" in st.session_state:
-        posthog.capture(
-            st.session_state["current_user"],
-            'page_view',
-            {
-                'page': 'car_position_query',
-                'timestamp': datetime.now().isoformat()
-            }
-        )
+       
 
     # Get BigQuery client
     client = get_bigquery_client()
@@ -249,7 +236,7 @@ def main():
     if 'query_results' in st.session_state and not st.session_state['query_results'].empty:
         df = st.session_state['query_results']
 
-        
+
         # Get all unreserved cars
         all_unreserved_cars = df[
             df['retail_current_status'] != 'Reserved'] if 'retail_current_status' in df.columns else pd.DataFrame()
