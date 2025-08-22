@@ -36,42 +36,14 @@ def check_password():
             st.session_state["password_correct"] = True
             st.session_state["current_user"] = st.session_state["username"]  # Store the username
 
-            # Track login
-            posthog.identify(
-                st.session_state["username"],
-                {
-                    'email': st.session_state["username"],
-                    'name': st.session_state["username"].split('@')[0].replace('.', ' ').title(),
-                    'last_login': datetime.now().isoformat()
-                }
-            )
-
-            posthog.capture(
-                st.session_state["username"],
-                '$login',
-                {
-                    'app': 'Car Position Query Tool',
-                    'login_method': 'password',
-                    'success': True
-                }
-            )
+            
 
             del st.session_state["password"]  # Don't store the password
             del st.session_state["username"]  # Don't store the username
         else:
             st.session_state["password_correct"] = False
             if "username" in st.session_state:
-                posthog.capture(
-                    st.session_state["username"],
-                    '$login_failed',
-                    {
-                        'app': 'Car Position Query Tool',
-                        'login_method': 'password',
-                        'reason': 'invalid_credentials',
-                        'attempted_email': st.session_state["username"]
-                    }
-                )
-
+               
     # Return True if the password is validated
     if st.session_state.get("password_correct", False):
         return True
@@ -204,14 +176,7 @@ def main():
             with st.spinner("Running query..."):
                 # Track query execution
                 if "current_user" in st.session_state:
-                    posthog.capture(
-                        st.session_state["current_user"],
-                        'query_executed',
-                        {
-                            'query_type': 'car_position',
-                            'timestamp': datetime.now().isoformat()
-                        }
-                    )
+                    
 
                 df = run_car_position_query(client)
 
