@@ -148,7 +148,7 @@ def main():
     )
 
     st.title("🚗 Car Position Query Tool")
-    st.markdown("*Get all unreserved cars with bottom 10 (by position) listed first*")
+    st.markdown("*Get all available cars (excluding RESERVED & PURCHASE_IN_PROGRESS) with bottom 10 (by position) listed first*")
 
     if not check_password():
         return
@@ -190,7 +190,7 @@ def main():
         **This tool will:**
         1. Run the car position query for today's data
         2. Order results by position (descending - bottom cars first)
-        3. Get ALL unreserved cars from the query
+        3. Get ALL available cars (excluding RESERVED & PURCHASE_IN_PROGRESS) from the query
         4. Reorder so bottom 10 cars appear first in the list
         5. Provide all car names in copy-ready format: C-12345,C-67890,...
         """)
@@ -200,9 +200,10 @@ def main():
         df = st.session_state['query_results']
 
 
-        # Get all unreserved cars
+        # Get all unreserved cars (exclude RESERVED and PURCHASE_IN_PROGRESS)
         all_unreserved_cars = df[
-            df['retail_current_status'] != 'Reserved'] if 'retail_current_status' in df.columns else pd.DataFrame()
+            (~df['retail_current_status'].isin(['Reserved', 'RESERVED', 'PURCHASE_IN_PROGRESS'])) 
+        ] if 'retail_current_status' in df.columns else pd.DataFrame()
 
         if not all_unreserved_cars.empty:
             # Get bottom 10 unreserved cars (first 10 from the DESC ordered data)
@@ -215,7 +216,7 @@ def main():
             reordered_car_names = bottom_10_unreserved + remaining_unreserved
             formatted_names = format_car_names_for_copy(reordered_car_names)
 
-            st.subheader("🔓 All Unreserved Cars (Bottom 10 First)")
+            st.subheader("🔓 All Available Cars (Bottom 10 First)")
 
             st.subheader("📋 Car Names (Ready to Copy)")
 
@@ -230,14 +231,14 @@ def main():
             # Also show as code block for backup
             st.code(formatted_names, language="text")
 
-            st.success(f"Found {len(reordered_car_names)} total unreserved cars (bottom 10 listed first)")
+            st.success(f"Found {len(reordered_car_names)} total available cars (bottom 10 listed first)")
             st.info(f"Bottom 10 cars: {len(bottom_10_unreserved)} | Remaining cars: {len(remaining_unreserved)}")
 
             # Track copy action
             if "current_user" in st.session_state:
                 pass  # Analytics tracking would go here
         else:
-            st.warning("No unreserved cars found.")
+            st.warning("No available cars found (all cars are RESERVED or PURCHASE_IN_PROGRESS).")
 
         # Show all results in expandable section
         with st.expander("📈 View All Query Results", expanded=False):
