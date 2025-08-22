@@ -155,7 +155,7 @@ def main():
 
     # Track page view
     if "current_user" in st.session_state:
-       
+        pass  # User tracking would go here
 
     # Get BigQuery client
     client = get_bigquery_client()
@@ -174,7 +174,7 @@ def main():
             with st.spinner("Running query..."):
                 # Track query execution
                 if "current_user" in st.session_state:
-                    
+                    pass  # Query tracking would go here
 
                 df = run_car_position_query(client)
 
@@ -235,22 +235,13 @@ def main():
 
             # Track copy action
             if "current_user" in st.session_state:
-                posthog.capture(
-                    st.session_state["current_user"],
-                    'all_unreserved_car_names_generated',
-                    {
-                        'total_count': len(reordered_car_names),
-                        'bottom_10_count': len(bottom_10_unreserved),
-                        'remaining_count': len(remaining_unreserved),
-                        'car_names': formatted_names,
-                        'timestamp': datetime.now().isoformat()
-                    }
-                )
+                pass  # Analytics tracking would go here
         else:
             st.warning("No unreserved cars found.")
 
         # Show all results in expandable section
         with st.expander("📈 View All Query Results", expanded=False):
+            
             st.dataframe(
                 df,
                 column_config={
